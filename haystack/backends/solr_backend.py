@@ -356,6 +356,8 @@ class SearchBackend(BaseSearchBackend):
                 field_data['type'] = 'ngram'
             elif field_class.field_type == 'edge_ngram':
                 field_data['type'] = 'edge_ngram'
+            elif field_class.field_type == 'location':
+                field_data['type'] = 'location'
             
             if field_class.is_multivalued:
                 field_data['multi_valued'] = 'true'
@@ -478,6 +480,16 @@ class SearchQuery(BaseSearchQuery):
         
         if self.narrow_queries:
             kwargs['narrow_queries'] = self.narrow_queries
+        else:
+            kwargs['narrow_queries'] = set()
+
+        if self.spatial_query:
+            kwargs['narrow_queries'].add('{!bbox pt=%s,%s sfield=%s d=%s}'% (
+                self.spatial_query['lat'],
+                self.spatial_query['lng'],
+                self.spatial_query['sfield'],
+                self.spatial_query['d'])
+            )
         
         if spelling_query:
             kwargs['spelling_query'] = spelling_query

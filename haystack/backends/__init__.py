@@ -10,6 +10,7 @@ from django.utils.encoding import force_unicode
 from haystack.constants import DJANGO_CT, VALID_FILTERS, FILTER_SEPARATOR
 from haystack.exceptions import SearchBackendError, MoreLikeThisError, FacetingError
 from haystack.models import SearchResult
+from haystack.exceptions import SpatialError
 try:
     from django.utils import importlib
 except ImportError:
@@ -286,6 +287,7 @@ class BaseSearchQuery(object):
         self.end_offset = None
         self.highlight = False
         self.facets = set()
+        self.spatial_query = {}
         self.date_facets = {}
         self.query_facets = []
         self.narrow_queries = set()
@@ -654,6 +656,11 @@ class BaseSearchQuery(object):
         """Adds highlighting to the search results."""
         self.highlight = True
     
+    def add_spatial(self, **kwargs):
+        if 'lat' not in kwargs or 'lng' not in kwargs or 'd' not in kwargs or 'sfield' not in kwargs:
+            raise SpatialError("Spatial queries must contains args lat, lng, d and sfield")
+        self.spatial_query.update(kwargs)
+
     def add_field_facet(self, field):
         """Adds a regular facet on a field."""
         self.facets.add(self.backend.site.get_facet_field_name(field))
@@ -735,6 +742,7 @@ class BaseSearchQuery(object):
         clone.boost = self.boost.copy()
         clone.highlight = self.highlight
         clone.facets = self.facets.copy()
+        clone.spatial_query = self.spatial_query.copy()
         clone.date_facets = self.date_facets.copy()
         clone.query_facets = self.query_facets[:]
         clone.narrow_queries = self.narrow_queries.copy()

@@ -320,6 +320,12 @@ class SearchQuerySet(object):
         clone = self._clone()
         clone.query.add_boost(term, boost)
         return clone
+
+    def spatial(self, **kwargs):
+        """Adds spatial search to the query"""
+        clone = self._clone()
+        clone.query.add_spatial(**kwargs)
+        return clone
     
     def facet(self, field):
         """Adds faceting to a query for the provided field."""
