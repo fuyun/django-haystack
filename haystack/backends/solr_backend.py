@@ -484,7 +484,8 @@ class SearchQuery(BaseSearchQuery):
             kwargs['narrow_queries'] = set()
 
         if self.spatial_query:
-            kwargs['narrow_queries'].add('{!bbox pt=%s,%s sfield=%s d=%s}'% (
+            kwargs['narrow_queries'].add('{!%s pt=%s,%s sfield=%s d=%s}'% (
+                self.spatial_query['filter'],
                 self.spatial_query['lat'],
                 self.spatial_query['lng'],
                 self.spatial_query['sfield'],

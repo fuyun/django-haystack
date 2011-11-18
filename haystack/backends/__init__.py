@@ -659,6 +659,8 @@ class BaseSearchQuery(object):
     def add_spatial(self, **kwargs):
         if 'lat' not in kwargs or 'lng' not in kwargs or 'd' not in kwargs or 'sfield' not in kwargs:
             raise SpatialError("Spatial queries must contains args lat, lng, d and sfield")
+        if 'filter' not in kwargs:
+            kwargs['filter'] = 'geofilt'
         self.spatial_query.update(kwargs)
 
     def add_field_facet(self, field):
